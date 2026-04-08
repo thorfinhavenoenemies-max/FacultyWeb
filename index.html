@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendX — College Attendance Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #07090f;
+  --bg2:     #0d1117;
+  --bg3:     #161c28;
+  --card:    #111827;
+  --border:  #1f2d45;
+  --accent:  #6366f1;
+  --accentL: #818cf8;
+  --accent2: #34d399;
+  --accent3: #fb923c;
+  --warn:    #fbbf24;
+  --danger:  #f87171;
+  --text:    #e2e8f0;
+  --muted:   #4b5c77;
+  --present: #22c55e;
+  --absent:  #ef4444;
+  --holiday: #c084fc;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── LOGIN ─── */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;overflow:hidden;}
+.lb{position:absolute;inset:0;}
+.lb::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 30% 40%,#6366f130,transparent 65%),
+             radial-gradient(ellipse 50% 40% at 80% 70%,#34d39920,transparent 60%);}
+.grid-bg{position:absolute;inset:0;opacity:.05;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:48px 48px;}
+.dots-bg{position:absolute;inset:0;opacity:.12;
+  background-image:radial-gradient(circle,var(--accentL) 1px,transparent 1px);
+  background-size:30px 30px;}
+.lcard{position:relative;background:var(--card);border:1px solid var(--border);border-radius:24px;
+  padding:52px 48px;width:440px;max-width:95vw;
+  box-shadow:0 40px 100px #00000099,0 0 0 1px #6366f115 inset;
+  animation:fadeUp .65s cubic-bezier(.22,1,.36,1) both;}
+.lbadge{display:inline-flex;align-items:center;gap:8px;background:#6366f115;
+  border:1px solid #6366f130;border-radius:99px;padding:6px 14px;
+  font-size:11px;color:var(--accentL);font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:28px;}
+.llogo{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.licon{width:54px;height:54px;border-radius:16px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 12px 32px #6366f155;flex-shrink:0;}
+.llogo h1{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-1.5px;}
+.llogo h1 span{color:var(--accent);}
+.ldept{color:var(--muted);font-size:13px;margin-bottom:36px;padding-left:68px;margin-top:-4px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:15px 18px;color:var(--text);font-size:15px;
+  outline:none;transition:border .2s,box-shadow .2s;font-family:'DM Sans',sans-serif;}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #6366f120;}
+.lerr{color:var(--danger);font-size:13px;display:none;margin-bottom:14px;
+  padding:10px 14px;background:#f8717112;border-radius:10px;}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 22px;border:none;border-radius:12px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.02em;transition:all .2s;white-space:nowrap;}
+.btn-p{background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff;width:100%;
+  box-shadow:0 8px 28px #6366f145;}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 36px #6366f160;}
+.btn-s{background:var(--bg3);border:1px solid var(--border);color:var(--text);}
+.btn-s:hover{border-color:var(--accent);color:var(--accentL);}
+.btn-g{background:linear-gradient(135deg,#059669,var(--accent2));color:#fff;}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 24px #34d39940;}
+.btn-o{background:linear-gradient(135deg,#ea580c,var(--accent3));color:#fff;}
+.btn-o:hover{transform:translateY(-2px);box-shadow:0 8px 24px #fb923c40;}
+.btn-d{background:#1c1a2e;border:1px solid #f8717140;color:var(--danger);}
+.btn-d:hover{background:#2a1a1a;}
+.btn-sm{padding:9px 16px;font-size:12px;border-radius:10px;}
+
+/* ─── APP ─── */
+#app{display:none;min-height:100vh;flex-direction:column;}
+header{background:var(--card);border-bottom:1px solid var(--border);
+  padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;}
+.hleft{display:flex;align-items:center;gap:12px;}
+.hicon{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  display:flex;align-items:center;justify-content:center;font-size:17px;}
+.htitle{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.5px;}
+.htitle span{color:var(--accent);}
+.hsubt{font-size:11px;color:var(--muted);margin-top:1px;}
+.hright{display:flex;align-items:center;gap:10px;}
+.upill{background:var(--bg3);border:1px solid var(--border);border-radius:99px;
+  padding:6px 14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.udot{width:7px;height:7px;border-radius:50%;background:var(--accent2);}
+.upill b{color:var(--text);}
+
+/* ─── TABS ─── */
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 28px;overflow-x:auto;}
+.tab{display:flex;align-items:center;gap:7px;padding:16px 20px;
+  font-family:'Syne',sans-serif;font-weight:600;font-size:13px;
+  color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);}
+.tcnt{background:var(--bg3);border-radius:99px;padding:2px 8px;font-size:10px;}
+.tab.active .tcnt{background:#6366f120;color:var(--accentL);}
+
+/* ─── PAGES ─── */
+.page{display:none;padding:28px 32px;animation:fadeUp .35s ease;}
+.page.active{display:block;}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.ptitle{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.psub{font-size:13px;color:var(--muted);margin-top:3px;}
+
+/* ─── STATS ─── */
+.sstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:13px;margin-bottom:24px;}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 20px;position:relative;overflow:hidden;}
+.scard::after{content:'';position:absolute;top:-18px;right:-18px;width:72px;height:72px;border-radius:50%;opacity:.07;}
+.slabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;}
+.sval{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1;}
+.ssub{font-size:11px;color:var(--muted);margin-top:5px;}
+.si::after{background:var(--accent);} .si .sval{color:var(--accentL);}
+.sg::after{background:var(--accent2);} .sg .sval{color:var(--accent2);}
+.so::after{background:var(--accent3);} .so .sval{color:var(--accent3);}
+.sp::after{background:var(--holiday);} .sp .sval{color:var(--holiday);}
+
+/* ─── TABLE ─── */
+.twrap{overflow-x:auto;border-radius:16px;border:1px solid var(--border);background:var(--card);}
+table{width:100%;border-collapse:collapse;min-width:600px;}
+thead tr{background:var(--bg3);}
+th{padding:12px 13px;text-align:center;font-family:'Syne',sans-serif;font-size:10px;
+  font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;
+  border-bottom:1px solid var(--border);white-space:nowrap;}
+th.sc{text-align:left;position:sticky;left:0;z-index:3;background:var(--bg3);}
+td{padding:11px 13px;border-bottom:1px solid #131e2e;text-align:center;font-size:13px;}
+td.sc{text-align:left;position:sticky;left:0;background:var(--card);z-index:1;font-weight:500;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#0d1520;}
+tr:hover td.sc{background:#0a1219;}
+.cp{color:var(--present);font-weight:700;font-size:14px;}
+.ca{color:var(--absent);font-weight:700;font-size:14px;}
+.ch{color:var(--holiday);font-size:12px;}
+.cn{color:var(--muted);font-size:12px;}
+.rno{font-size:11px;color:var(--muted);background:var(--bg3);border-radius:6px;padding:3px 8px;}
+.ppill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:99px;
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;}
+.pg{background:#22c55e18;color:var(--present);}
+.po{background:#fbbf2418;color:var(--warn);}
+.pb{background:#ef444418;color:var(--danger);}
+.pwrap{height:3px;background:var(--border);border-radius:3px;margin-top:4px;overflow:hidden;min-width:55px;}
+.pfill{height:100%;border-radius:3px;transition:width .6s ease;}
+.dh{cursor:pointer;user-select:none;transition:color .15s;}
+.dh:hover{color:var(--text);}
+.hth{color:var(--holiday)!important;}
+.hbadge{font-size:9px;display:block;color:var(--holiday);font-weight:600;margin-top:2px;}
+
+/* ─── WIZARD ─── */
+.wwrap{max-width:660px;margin:0 auto;}
+.wcard{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:44px;}
+.ws{display:none;}
+.ws.active{display:block;animation:fadeUp .35s ease;}
+.wtitle{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
+.wsub{color:var(--muted);font-size:13px;margin-bottom:28px;line-height:1.65;}
+.segrow{display:flex;gap:6px;margin-bottom:36px;}
+.seg{height:3px;flex:1;border-radius:3px;background:var(--border);transition:all .35s;}
+.seg.done{background:var(--accent2);}
+.seg.active{background:var(--accent);}
+.ig{margin-bottom:16px;}
+.ig label{display:block;font-size:11px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;}
+.ig input,.ig select{width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:11px;padding:13px 16px;color:var(--text);font-size:14px;
+  outline:none;transition:border .2s;font-family:'DM Sans',sans-serif;}
+.ig input:focus,.ig select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #6366f115;}
+select option{background:var(--bg3);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.snlist{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;padding-right:4px;}
+.snrow{display:flex;align-items:center;gap:10px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:11px;padding:10px 14px;transition:border .15s;}
+.snrow:focus-within{border-color:var(--accent);}
+.rchip{background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-size:11px;
+  font-weight:700;border-radius:7px;padding:4px 10px;min-width:34px;text-align:center;flex-shrink:0;}
+.snrow input{flex:1;background:transparent;border:none;color:var(--text);
+  font-size:14px;outline:none;font-family:'DM Sans',sans-serif;}
+.ibox{background:var(--bg3);border:1px solid var(--border);border-radius:13px;
+  padding:18px 20px;margin-bottom:22px;}
+.ibox li{font-size:13px;color:var(--muted);margin-bottom:7px;padding-left:4px;line-height:1.5;}
+.ibox li::marker{color:var(--accent);}
+.brow{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;}
+.alertbox{border-radius:12px;padding:13px 17px;margin-bottom:20px;font-size:13px;}
+.alertwarn{background:#fbbf2412;border:1px solid #fbbf2440;color:var(--warn);}
+.alertinfo{background:#6366f112;border:1px solid #6366f140;color:var(--accentL);}
+.alertholiday{background:#c084fc12;border:1px solid #c084fc40;color:var(--holiday);}
+.alertdanger{background:#ef444412;border:1px solid #ef444440;color:var(--danger);}
+
+/* ─── MODAL ─── */
+.overlay{display:none;position:fixed;inset:0;background:#00000095;z-index:200;
+  align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:22px;
+  padding:36px;width:580px;max-width:96vw;max-height:94vh;overflow-y:auto;
+  animation:fadeUp .3s cubic-bezier(.22,1,.36,1);}
+.mtitle{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;}
+.msub{color:var(--muted);font-size:13px;margin-bottom:20px;}
+.cklist{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding-right:4px;}
+.crow{display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  cursor:pointer;transition:all .15s;user-select:none;}
+.crow:hover{border-color:var(--accentL);}
+.crow.absent{border-color:var(--danger);background:#ef444410;}
+.cbox{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.crow.absent .cbox{background:var(--danger);border-color:var(--danger);}
+.ctick{color:#fff;font-size:12px;display:none;}
+.crow.absent .ctick{display:block;}
+.cname{font-weight:500;font-size:14px;}
+.croll{font-size:11px;color:var(--muted);}
+.atag{font-size:11px;color:var(--danger);margin-left:auto;font-weight:700;display:none;}
+.crow.absent .atag{display:block;}
+.sumbar{display:flex;gap:16px;margin:14px 0;padding:13px 17px;
+  background:var(--bg3);border-radius:12px;font-size:13px;}
+.sitem{display:flex;align-items:center;gap:7px;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ─── VAULT ─── */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;}
+.vcard{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.vcard:hover{transform:translateY(-4px);box-shadow:0 20px 56px #00000070;}
+.vthumb{width:100%;height:140px;background:var(--bg3);display:flex;align-items:center;
+  justify-content:center;font-size:42px;overflow:hidden;}
+.vthumb img{width:100%;height:100%;object-fit:cover;}
+.vbody{padding:13px 15px;}
+.vname{font-weight:600;font-size:13px;margin-bottom:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;}
+.vnote{font-size:11px;color:var(--muted);}
+.vfoot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;}
+.vtag{font-size:10px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:99px;padding:3px 9px;color:var(--muted);}
+.vdel{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;transition:color .15s;}
+.vdel:hover{color:var(--danger);}
+.uzone{border:2px dashed var(--border);border-radius:16px;padding:44px 20px;
+  text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);}
+.uzone:hover{border-color:var(--accent);background:#6366f108;}
+.uzone .uicon{font-size:44px;margin-bottom:12px;}
+.uzone p{font-size:13px;color:var(--muted);}
+
+/* ─── MISC ─── */
+.estate{text-align:center;padding:70px 20px;}
+.estate .ei{font-size:64px;margin-bottom:16px;opacity:.6;}
+.estate h3{font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px;}
+.estate p{color:var(--muted);font-size:14px;margin-bottom:22px;}
+.tipnote{font-size:12px;color:var(--muted);margin-top:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ LOGIN ══════════════════════ -->
+<div id="loginScreen">
+  <div class="lb"><div class="grid-bg"></div><div class="dots-bg"></div></div>
+  <div class="lcard">
+    <div class="lbadge">🎓 College Department Portal</div>
+    <div class="llogo">
+      <div class="licon">📋</div>
+      <h1>Attend<span>X</span></h1>
+    </div>
+    <p class="ldept">Department Attendance Management System</p>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="lu" placeholder="Enter username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="lp" placeholder="Enter password"
+             onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
+    </div>
+    <p class="lerr" id="lerr">⚠️ Invalid credentials. Access denied.</p>
+    <button class="btn btn-p" onclick="doLogin()">🔐 &nbsp;Sign In to Portal</button>
+    <p style="text-align:center;margin-top:18px;font-size:11px;color:var(--muted);">
+      Credentials: &nbsp;
+      <code style="background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--text);">admin</code>
+      &nbsp;/&nbsp;
+      <code style="background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--text);">admin123</code>
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════ APP ══════════════════════ -->
+<div id="app" style="display:none;flex-direction:column;">
+  <header>
+    <div class="hleft">
+      <div class="hicon">📋</div>
+      <div>
+        <div class="htitle">Attend<span>X</span></div>
+        <div class="hsubt">College Department Attendance Portal</div>
+      </div>
+    </div>
+    <div class="hright">
+      <div class="upill"><div class="udot"></div>Signed in as&nbsp;<b id="uLabel">admin</b></div>
+      <button class="btn btn-s btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-att" onclick="switchTab('att')">📋 Attendance <span class="tcnt" id="tc-att">—</span></div>
+    <div class="tab" id="tab-setup" onclick="switchTab('setup')">⚙️ Setup</div>
+    <div class="tab" id="tab-vault" onclick="switchTab('vault')">📁 Data Vault <span class="tcnt" id="tc-vault">0</span></div>
+  </div>
+
+  <!-- ─── ATTENDANCE ─── -->
+  <div class="page active" id="page-att">
+    <div id="att-empty" class="estate">
+      <div class="ei">🏫</div>
+      <h3>No Register Found</h3>
+      <p>Go to <b>Setup</b> to add students and configure your session date range.</p>
+      <button class="btn btn-p" onclick="switchTab('setup')" style="width:auto;padding:14px 28px;">Go to Setup →</button>
+    </div>
+    <div id="att-con" style="display:none;">
+      <div class="sstrip" id="sstrip"></div>
+      <div class="ph">
+        <div>
+          <div class="ptitle">📋 Attendance Register</div>
+          <div class="psub" id="regRange"></div>
+        </div>
+        <button class="btn btn-g" onclick="openUpdateModal()">✅ &nbsp;Update Attendance</button>
+      </div>
+      <div class="twrap">
+        <table><thead id="tH"></thead><tbody id="tB"></tbody></table>
+      </div>
+      <div class="tipnote">
+        💡 Click any <b>date column header</b> to toggle it as a holiday &nbsp;|&nbsp;
+        <span style="color:var(--present)">● Present (1)</span>&nbsp;
+        <span style="color:var(--absent)">● Absent (0)</span>&nbsp;
+        <span style="color:var(--holiday)">● Holiday</span>&nbsp;
+        <span style="color:var(--muted)">● Pending (—)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SETUP ─── -->
+  <div class="page" id="page-setup">
+    <div class="wwrap">
+      <div class="wcard">
+        <div class="segrow" id="segrow">
+          <div class="seg active" id="s0"></div>
+          <div class="seg" id="s1"></div>
+          <div class="seg" id="s2"></div>
+          <div class="seg" id="s3"></div>
+        </div>
+
+        <!-- Step 0: Welcome -->
+        <div class="ws active" id="ws0">
+          <div class="wtitle">👋 Welcome, Professor</div>
+          <p class="wsub">Set up your department attendance register in 4 quick steps. All data is stored securely in your browser.</p>
+          <ul class="ibox" style="list-style:disc;padding-left:20px;">
+            <li>Add all enrolled students with auto-assigned roll numbers</li>
+            <li>Set semester / session date range</li>
+            <li>Mark attendance daily — percentage auto-calculates</li>
+            <li>Store student photos, fee receipts & documents in the Vault</li>
+          </ul>
+          <div id="exist-alert" class="alertbox alertdanger" style="display:none;">
+            ⚠️ A register already exists. Creating a new one will <b>reset all attendance data</b>.
+          </div>
+          <button class="btn btn-p" onclick="wGo(1)">Begin Setup →</button>
+        </div>
+
+        <!-- Step 1: Count -->
+        <div class="ws" id="ws1">
+          <div class="wtitle">👥 Class Strength</div>
+          <p class="wsub">How many students are enrolled in this section?</p>
+          <div class="ig" style="max-width:220px;">
+            <label>Number of Students</label>
+            <input type="number" id="scount" min="1" max="300" placeholder="e.g. 60">
+          </div>
+          <div class="brow">
+            <button class="btn btn-s" onclick="wGo(0)">← Back</button>
+            <button class="btn btn-p" onclick="wGo(2)">Next →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Names -->
+        <div class="ws" id="ws2">
+          <div class="wtitle">📝 Student Names</div>
+          <p class="wsub">Enter names in attendance roll order. Roll numbers are assigned automatically.</p>
+          <div class="snlist" id="snlist"></div>
+          <div class="brow">
+            <button class="btn btn-s" onclick="wGo(1)">← Back</button>
+            <button class="btn btn-p" onclick="wGo(3)">Next →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Dates -->
+        <div class="ws" id="ws3">
+          <div class="wtitle">📅 Session Date Range</div>
+          <p class="wsub">Set the semester or course period. You can mark individual days as holidays later.</p>
+          <div class="row2">
+            <div class="ig"><label>From Date</label><input type="date" id="dFrom"></div>
+            <div class="ig"><label>To Date</label><input type="date" id="dTo"></div>
+          </div>
+          <div class="ig">
+            <label>Department / Subject (optional)</label>
+            <input type="text" id="dDept" placeholder="e.g. Computer Science — Data Structures (Sem 4)">
+          </div>
+          <div class="brow">
+            <button class="btn btn-s" onclick="wGo(2)">← Back</button>
+            <button class="btn btn-g" onclick="finalizeSetup()">🚀 &nbsp;Create Register</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:18px;" id="rstBtn" style="display:none;">
+        <button class="btn btn-d btn-sm" onclick="resetAll()">🗑️ Reset & Start Over</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── VAULT ─── -->
+  <div class="page" id="page-vault">
+    <div class="ph">
+      <div>
+        <div class="ptitle">📁 Data Vault</div>
+        <div class="psub">Store student photos, fee receipts, and documents</div>
+      </div>
+      <button class="btn btn-o" onclick="openVault()">+ &nbsp;Add Photo / File</button>
+    </div>
+    <div class="vgrid" id="vgrid"></div>
+  </div>
+</div>
+
+<!-- ══════════ UPDATE MODAL ══════════ -->
+<div class="overlay" id="updOv">
+  <div class="modal">
+    <div class="mtitle">✅ Mark Attendance</div>
+    <div class="msub">Select students who are <b style="color:var(--danger)">ABSENT</b>. All others are auto-marked <b style="color:var(--present)">PRESENT</b>.</div>
+
+    <div class="ig" style="max-width:220px;margin-bottom:8px;">
+      <label>Date</label>
+      <input type="date" id="updDate" onchange="onDateCh()">
+    </div>
+    <div id="wd-out" class="alertbox alertwarn" style="display:none;">⚠️ Date is outside your session range.</div>
+    <div id="wd-hol" class="alertbox alertholiday" style="display:none;">🎉 This day is marked as a Holiday.</div>
+    <div id="wd-dup" class="alertbox alertinfo" style="display:none;">ℹ️ Attendance already saved for this date — saving will overwrite it.</div>
+
+    <div class="cklist" id="cklist"></div>
+
+    <div class="sumbar" id="sumbar">
+      <div class="sitem"><div class="sdot" style="background:var(--present)"></div><span id="pCnt">0 Present</span></div>
+      <div class="sitem"><div class="sdot" style="background:var(--danger)"></div><span id="aCnt">0 Absent</span></div>
+    </div>
+
+    <div class="brow">
+      <button class="btn btn-s" onclick="closeUpdate()">Cancel</button>
+      <button class="btn btn-g" onclick="saveAtt()">💾 &nbsp;Save Attendance</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ VAULT MODAL ══════════ -->
+<div class="overlay" id="vaultOv">
+  <div class="modal">
+    <div class="mtitle">📁 Add to Data Vault</div>
+    <div class="msub">Upload a photo, bill, receipt, or document and label it.</div>
+    <div class="uzone" onclick="document.getElementById('vfile').click()">
+      <div class="uicon">📤</div>
+      <p>Click to browse — images or PDFs supported</p>
+      <div id="vprev" style="margin-top:12px;"></div>
+    </div>
+    <input type="file" id="vfile" accept="image/*,.pdf" style="display:none" onchange="prevFile(event)">
+    <div class="ig" style="margin-top:16px;">
+      <label>Label / Student Name</label>
+      <input type="text" id="vlabel" placeholder="e.g. Ravi Kumar — Fee Receipt June 2025">
+    </div>
+    <div class="row2">
+      <div class="ig">
+        <label>Category</label>
+        <select id="vcat">
+          <option>📸 Photo</option>
+          <option>🧾 Fee Receipt</option>
+          <option>📄 Document</option>
+          <option>📝 Note</option>
+          <option>🗂️ Other</option>
+        </select>
+      </div>
+      <div class="ig">
+        <label>Notes (optional)</label>
+        <input type="text" id="vnote" placeholder="Any extra details…">
+      </div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-s" onclick="closeVault()">Cancel</button>
+      <button class="btn btn-o" onclick="saveVault()">💾 &nbsp;Save to Vault</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:12px 22px;font-size:13px;z-index:9999;box-shadow:0 8px 32px #00000090;
+  white-space:nowrap;pointer-events:none;"></div>
+
+<script>
+/* ─── STATE ─── */
+const AUTH = { admin: 'admin123' };
+let S = (() => { try{ return JSON.parse(localStorage.getItem('attendx3'))||blank(); }catch{ return blank(); } })();
+function blank(){ return {students:[],dateFrom:'',dateTo:'',dept:'',attendance:{},holidays:[],vault:[]}; }
+function save(){ localStorage.setItem('attendx3', JSON.stringify(S)); }
+
+/* ─── AUTH ─── */
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  if(AUTH[u]===p){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('uLabel').textContent=u;
+    renderAll();
+  } else {
+    const e=document.getElementById('lerr');
+    e.style.display='block';
+    setTimeout(()=>e.style.display='none',3500);
+  }
+}
+function doLogout(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('lu').value='';
+  document.getElementById('lp').value='';
+}
+
+/* ─── TABS ─── */
+function switchTab(t){
+  ['att','setup','vault'].forEach(id=>{
+    document.getElementById('tab-'+id).classList.toggle('active',id===t);
+    document.getElementById('page-'+id).classList.toggle('active',id===t);
+  });
+  if(t==='att') renderAtt();
+  if(t==='vault') renderVault();
+}
+
+/* ─── WIZARD ─── */
+let ws=0;
+function wGo(n){
+  if(ws===1&&n>1){
+    const c=parseInt(document.getElementById('scount').value)||0;
+    if(c<1||c>300){ toast('⚠️ Enter a valid number (1–300)'); return; }
+    buildNames(c);
+  }
+  if(ws===2&&n>2){
+    if(getNames().some(x=>!x)){ toast('⚠️ Fill in all student names'); return; }
+  }
+  document.getElementById('ws'+ws).classList.remove('active');
+  document.getElementById('s'+ws).className='seg done';
+  ws=n;
+  document.getElementById('ws'+ws).classList.add('active');
+  document.getElementById('s'+ws).className='seg active';
+  if(n===0) document.getElementById('exist-alert').style.display=S.students.length?'block':'none';
+}
+function buildNames(cnt){
+  const el=document.getElementById('snlist');
+  el.innerHTML='';
+  for(let i=0;i<cnt;i++){
+    const d=document.createElement('div'); d.className='snrow';
+    d.innerHTML=`<span class="rchip">${String(i+1).padStart(2,'0')}</span>
+      <input type="text" placeholder="Student ${i+1} full name…" id="sn_${i}">`;
+    el.appendChild(d);
+  }
+}
+function getNames(){
+  const cnt=parseInt(document.getElementById('scount').value)||0;
+  return Array.from({length:cnt},(_,i)=>{ const e=document.getElementById('sn_'+i); return e?e.value.trim():''; });
+}
+function finalizeSetup(){
+  const f=document.getElementById('dFrom').value, t=document.getElementById('dTo').value;
+  if(!f||!t){ toast('⚠️ Select both dates'); return; }
+  if(f>t){ toast('⚠️ From date must be before To date'); return; }
+  S.students=getNames().map((n,i)=>({roll:i+1,name:n}));
+  S.dateFrom=f; S.dateTo=t; S.dept=document.getElementById('dDept').value.trim();
+  S.attendance={}; S.holidays=[];
+  save(); renderAll();
+  toast('✅ Register created successfully!');
+  setTimeout(()=>switchTab('att'),700);
+}
+function resetAll(){
+  if(!confirm('Reset everything? All attendance data will be permanently deleted.')) return;
+  S=blank(); save();
+  ws=0;
+  ['s0','s1','s2','s3'].forEach((s,i)=>document.getElementById(s).className='seg'+(i===0?' active':''));
+  ['ws0','ws1','ws2','ws3'].forEach((w,i)=>document.getElementById(w).className='ws'+(i===0?' active':''));
+  renderAll(); switchTab('setup');
+}
+
+/* ─── DATE UTILS ─── */
+function getDates(f,t){ const a=[],d=new Date(f+'T00:00:00'),e=new Date(t+'T00:00:00'); while(d<=e){a.push(d.toISOString().split('T')[0]);d.setDate(d.getDate()+1);} return a; }
+function fmt(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
+function fmtW(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short'}); }
+function today(){ return new Date().toISOString().split('T')[0]; }
+
+/* ─── RENDER ─── */
+function renderAll(){
+  renderAtt(); renderVault();
+  document.getElementById('tc-vault').textContent=S.vault.length;
+  document.getElementById('tc-att').textContent=S.students.length?S.students.length+'s':'—';
+  document.getElementById('rstBtn').style.display=S.students.length?'block':'none';
+}
+
+function renderAtt(){
+  const emp=document.getElementById('att-empty'), con=document.getElementById('att-con');
+  if(!S.students.length){ emp.style.display='block'; con.style.display='none'; return; }
+  emp.style.display='none'; con.style.display='block';
+
+  const dates=getDates(S.dateFrom,S.dateTo);
+  const classDays=dates.filter(d=>!S.holidays.includes(d)).length;
+  const doneDays=dates.filter(d=>!S.holidays.includes(d)&&S.attendance[d]).length;
+
+  document.getElementById('regRange').textContent=
+    (S.dept?S.dept+' · ':'')+fmt(S.dateFrom)+' — '+fmt(S.dateTo);
+
+  document.getElementById('sstrip').innerHTML=`
+    <div class="scard si"><div class="slabel">Total Students</div><div class="sval">${S.students.length}</div><div class="ssub">Enrolled</div></div>
+    <div class="scard sg"><div class="slabel">Class Days</div><div class="sval">${classDays}</div><div class="ssub">${S.holidays.length} holiday${S.holidays.length!==1?'s':''}</div></div>
+    <div class="scard so"><div class="slabel">Recorded</div><div class="sval">${doneDays}</div><div class="ssub">Days marked</div></div>
+    <div class="scard sp"><div class="slabel">Pending</div><div class="sval">${classDays-doneDays}</div><div class="ssub">Days remaining</div></div>`;
+
+  // Head
+  let head='<tr><th class="sc">Student</th><th>Roll</th>';
+  dates.forEach(d=>{
+    const isH=S.holidays.includes(d);
+    head+=`<th class="dh${isH?' hth':''}" onclick="togHol('${d}')" title="${isH?'Click to unmark holiday':'Click to mark as holiday'}">
+      ${fmt(d)}<br><span style="font-weight:400;font-size:9px;opacity:.7;">${fmtW(d)}</span>
+      ${isH?'<span class="hbadge">HOLIDAY</span>':''}
+    </th>`;
+  });
+  head+='<th>Attendance %</th></tr>';
+  document.getElementById('tH').innerHTML=head;
+
+  // Body
+  let body='';
+  S.students.forEach(s=>{
+    let prs=0,tot=0,cells='';
+    dates.forEach(d=>{
+      if(S.holidays.includes(d)){ cells+=`<td class="ch">🎉</td>`; return; }
+      tot++;
+      if(S.attendance[d]){
+        if(S.attendance[d][s.roll]===0){ cells+=`<td class="ca">0</td>`; }
+        else{ prs++; cells+=`<td class="cp">1</td>`; }
+      } else cells+=`<td class="cn">—</td>`;
+    });
+    const pct=tot>0?Math.round(prs/tot*100):0;
+    const pc=pct>=75?'pg':pct>=50?'po':'pb';
+    const fc=pct>=75?'var(--present)':pct>=50?'var(--warn)':'var(--danger)';
+    body+=`<tr>
+      <td class="sc">${s.name}</td>
+      <td><span class="rno">${String(s.roll).padStart(2,'0')}</span></td>
+      ${cells}
+      <td>
+        <span class="ppill ${pc}">${pct}%</span>
+        <div class="pwrap"><div class="pfill" style="width:${pct}%;background:${fc};"></div></div>
+      </td>
+    </tr>`;
+  });
+  document.getElementById('tB').innerHTML=body;
+}
+
+function togHol(d){
+  const i=S.holidays.indexOf(d);
+  if(i>=0) S.holidays.splice(i,1); else S.holidays.push(d);
+  save(); renderAtt();
+  toast(S.holidays.includes(d)?'🎉 Marked as Holiday':'📅 Holiday removed');
+}
+
+/* ─── UPDATE MODAL ─── */
+let aSet=new Set();
+function openUpdateModal(){
+  aSet=new Set();
+  document.getElementById('updDate').value=today();
+  buildChecklist(); onDateCh();
+  document.getElementById('updOv').classList.add('open');
+}
+function closeUpdate(){ document.getElementById('updOv').classList.remove('open'); }
+function buildChecklist(){
+  const el=document.getElementById('cklist'); el.innerHTML='';
+  S.students.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='crow'; d.id='cr_'+s.roll;
+    d.onclick=()=>togAbs(s.roll);
+    d.innerHTML=`<div class="cbox"><span class="ctick">✕</span></div>
+      <div><div class="cname">${s.name}</div><div class="croll">Roll No. ${String(s.roll).padStart(2,'0')}</div></div>
+      <span class="atag">ABSENT</span>`;
+    el.appendChild(d);
+  });
+  refreshSum();
+}
+function togAbs(roll){
+  const el=document.getElementById('cr_'+roll);
+  if(aSet.has(roll)){ aSet.delete(roll); el.classList.remove('absent'); }
+  else{ aSet.add(roll); el.classList.add('absent'); }
+  refreshSum();
+}
+function refreshSum(){
+  const a=aSet.size, p=S.students.length-a;
+  document.getElementById('aCnt').textContent=a+' Absent';
+  document.getElementById('pCnt').textContent=p+' Present';
+}
+function onDateCh(){
+  const d=document.getElementById('updDate').value;
+  document.getElementById('wd-out').style.display=(d&&(d<S.dateFrom||d>S.dateTo))?'block':'none';
+  document.getElementById('wd-hol').style.display=S.holidays.includes(d)?'block':'none';
+  document.getElementById('wd-dup').style.display=S.attendance[d]?'block':'none';
+}
+function saveAtt(){
+  const d=document.getElementById('updDate').value;
+  if(!d){ toast('⚠️ Select a date'); return; }
+  S.attendance[d]={};
+  S.students.forEach(s=>{ S.attendance[d][s.roll]=aSet.has(s.roll)?0:1; });
+  save(); closeUpdate(); renderAtt();
+  toast('✅ Attendance saved for '+fmt(d));
+}
+
+/* ─── VAULT ─── */
+let vData=null,vType='';
+function openVault(){
+  vData=null; vType='';
+  ['vlabel','vnote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('vcat').selectedIndex=0;
+  document.getElementById('vprev').innerHTML='';
+  document.getElementById('vfile').value='';
+  document.getElementById('vaultOv').classList.add('open');
+}
+function closeVault(){ document.getElementById('vaultOv').classList.remove('open'); }
+function prevFile(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    vData=ev.target.result; vType=f.type;
+    const p=document.getElementById('vprev');
+    if(f.type.startsWith('image/'))
+      p.innerHTML=`<img src="${vData}" style="max-height:110px;border-radius:10px;margin-top:8px;">`;
+    else
+      p.innerHTML=`<div style="color:var(--accent2);font-size:13px;margin-top:8px;">📄 ${f.name}</div>`;
+  };
+  r.readAsDataURL(f);
+}
+function saveVault(){
+  const lbl=document.getElementById('vlabel').value.trim();
+  if(!lbl){ toast('⚠️ Add a label'); return; }
+  if(!vData){ toast('⚠️ Select a file'); return; }
+  S.vault.push({id:Date.now(),label:lbl,note:document.getElementById('vnote').value.trim(),
+    cat:document.getElementById('vcat').value,data:vData,type:vType});
+  save(); closeVault(); renderVault();
+  document.getElementById('tc-vault').textContent=S.vault.length;
+  toast('📁 Saved to vault!');
+}
+function renderVault(){
+  const g=document.getElementById('vgrid');
+  document.getElementById('tc-vault').textContent=S.vault.length;
+  if(!S.vault.length){
+    g.innerHTML=`<div class="estate" style="grid-column:1/-1;"><div class="ei">📂</div>
+      <h3>Vault is Empty</h3><p>Store student photos, fee receipts, and documents here for easy access.</p></div>`;
+    return;
+  }
+  g.innerHTML=S.vault.map(v=>`
+    <div class="vcard">
+      <div class="vthumb">${v.type.startsWith('image/')?`<img src="${v.data}" alt="${v.label}">`:'📄'}</div>
+      <div class="vbody">
+        <div class="vname" title="${v.label}">${v.label}</div>
+        ${v.note?`<div class="vnote">${v.note}</div>`:''}
+        <div class="vfoot">
+          <span class="vtag">${v.cat}</span>
+          <button class="vdel" onclick="delV(${v.id})" title="Delete">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function delV(id){
+  if(!confirm('Delete this file from the vault?')) return;
+  S.vault=S.vault.filter(v=>v.id!==id);
+  save(); renderVault();
+}
+
+/* ─── TOAST ─── */
+let tT;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.display='block';
+  clearTimeout(tT); tT=setTimeout(()=>el.style.display='none',2800);
+}
+
+/* ─── CLOSE ON BACKDROP ─── */
+['updOv','vaultOv'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this) this.classList.remove('open');
+  });
+});
+
+/* ─── INIT ─── */
+(function(){
+  const td=today();
+  ['dFrom','dTo','updDate'].forEach(id=>document.getElementById(id).value=td);
+  if(S.students.length){
+    document.getElementById('rstBtn').style.display='block';
+    document.getElementById('exist-alert').style.display='block';
+  }
+})();
+</script>
+</body>
+</html>
