@@ -3,8 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AttendX — College Attendance Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<title>Attend X — SSREC Attendance Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- ══════════════════ PRINT STYLES ══════════════════ -->
+<style id="printCSS">
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: #fff !important; color: #111 !important; font-family: Arial, sans-serif !important; margin: 0; }
+  #loginScreen, header, .tabs, #page-setup, #page-vault,
+  .btn, .tipnote, .sstrip, footer,
+  #att-empty, .ph { display: none !important; }
+  #app { display: block !important; }
+  #page-att { display: block !important; padding: 0 !important; }
+  #att-con { display: block !important; }
+  .print-header { display: block !important; }
+  .twrap { border: 1px solid #ccc !important; border-radius: 0 !important; overflow: visible !important; }
+  table { page-break-inside: auto; width: 100% !important; font-size: 10px !important; }
+  tr { page-break-inside: avoid; }
+  th { background: #1e1b4b !important; color: #fff !important; padding: 7px 8px !important; font-size: 9px !important; }
+  td { padding: 6px 8px !important; border-bottom: 1px solid #e5e7eb !important; }
+  td.sc { background: #f9fafb !important; }
+  .cp { color: #16a34a !important; font-weight: 700 !important; }
+  .ca { color: #dc2626 !important; font-weight: 700 !important; }
+  .ch { color: #7c3aed !important; }
+  .cn { color: #9ca3af !important; }
+  .ppill { border: 1px solid #ccc !important; padding: 2px 7px !important; border-radius: 99px !important; font-size: 9px !important; font-weight: 700 !important; }
+  .pg { border-color: #16a34a !important; color: #16a34a !important; }
+  .po { border-color: #d97706 !important; color: #d97706 !important; }
+  .pb { border-color: #dc2626 !important; color: #dc2626 !important; }
+  .pwrap { display: none !important; }
+  .rno { background: #f3f4f6 !important; color: #374151 !important; padding: 2px 6px !important; border-radius: 4px !important; font-size: 9px !important; }
+  .pct-col { background: #f0fdf4 !important; }
+  .print-footer { display: block !important; margin-top: 16px; font-size: 10px; color: #6b7280; text-align: center; }
+}
+</style>
+
 <style>
 :root {
   --bg:      #07090f;
@@ -27,6 +61,10 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── PRINT HEADER (hidden on screen) ─── */
+.print-header { display: none; }
+.print-footer { display: none; }
 
 /* ─── LOGIN ─── */
 #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;overflow:hidden;}
@@ -81,6 +119,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 24px #34d39940;}
 .btn-o{background:linear-gradient(135deg,#ea580c,var(--accent3));color:#fff;}
 .btn-o:hover{transform:translateY(-2px);box-shadow:0 8px 24px #fb923c40;}
+.btn-pdf{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;
+  box-shadow:0 8px 24px #7c3aed40;}
+.btn-pdf:hover{transform:translateY(-2px);box-shadow:0 12px 32px #a855f760;}
 .btn-d{background:#1c1a2e;border:1px solid #f8717140;color:var(--danger);}
 .btn-d:hover{background:#2a1a1a;}
 .btn-sm{padding:9px 16px;font-size:12px;border-radius:10px;}
@@ -119,12 +160,13 @@ header{background:var(--card);border-bottom:1px solid var(--border);
 .page{display:none;padding:28px 32px;animation:fadeUp .35s ease;}
 .page.active{display:block;}
 .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.phbtns{display:flex;gap:10px;flex-wrap:wrap;}
 .ptitle{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
 .psub{font-size:13px;color:var(--muted);margin-top:3px;}
 
 /* ─── STATS ─── */
 .sstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:13px;margin-bottom:24px;}
-.scard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 20px;position:relative;overflow:hidden;}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;}
 .scard::after{content:'';position:absolute;top:-18px;right:-18px;width:72px;height:72px;border-radius:50%;opacity:.07;}
 .slabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;}
 .sval{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1;}
@@ -138,26 +180,29 @@ header{background:var(--card);border-bottom:1px solid var(--border);
 .twrap{overflow-x:auto;border-radius:16px;border:1px solid var(--border);background:var(--card);}
 table{width:100%;border-collapse:collapse;min-width:600px;}
 thead tr{background:var(--bg3);}
-th{padding:12px 13px;text-align:center;font-family:'Syne',sans-serif;font-size:10px;
+th{padding:12px 12px;text-align:center;font-family:'Syne',sans-serif;font-size:10px;
   font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;
   border-bottom:1px solid var(--border);white-space:nowrap;}
 th.sc{text-align:left;position:sticky;left:0;z-index:3;background:var(--bg3);}
-td{padding:11px 13px;border-bottom:1px solid #131e2e;text-align:center;font-size:13px;}
+th.pct-th{background:linear-gradient(135deg,#1e1b4b,#312e81);color:var(--accentL);border-left:2px solid var(--accent);}
+td{padding:10px 12px;border-bottom:1px solid #131e2e;text-align:center;font-size:13px;}
 td.sc{text-align:left;position:sticky;left:0;background:var(--card);z-index:1;font-weight:500;}
+td.pct-td{border-left:2px solid #6366f130;background:#1e1b4b18;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#0d1520;}
 tr:hover td.sc{background:#0a1219;}
+tr:hover td.pct-td{background:#1e1b4b30;}
 .cp{color:var(--present);font-weight:700;font-size:14px;}
 .ca{color:var(--absent);font-weight:700;font-size:14px;}
 .ch{color:var(--holiday);font-size:12px;}
 .cn{color:var(--muted);font-size:12px;}
 .rno{font-size:11px;color:var(--muted);background:var(--bg3);border-radius:6px;padding:3px 8px;}
-.ppill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:99px;
+.ppill{display:inline-flex;align-items:center;padding:4px 11px;border-radius:99px;
   font-family:'Syne',sans-serif;font-size:11px;font-weight:700;}
 .pg{background:#22c55e18;color:var(--present);}
 .po{background:#fbbf2418;color:var(--warn);}
 .pb{background:#ef444418;color:var(--danger);}
-.pwrap{height:3px;background:var(--border);border-radius:3px;margin-top:4px;overflow:hidden;min-width:55px;}
+.pwrap{height:3px;background:var(--border);border-radius:3px;margin-top:5px;overflow:hidden;min-width:55px;}
 .pfill{height:100%;border-radius:3px;transition:width .6s ease;}
 .dh{cursor:pointer;user-select:none;transition:color .15s;}
 .dh:hover{color:var(--text);}
@@ -197,7 +242,7 @@ select option{background:var(--bg3);}
 .ibox li{font-size:13px;color:var(--muted);margin-bottom:7px;padding-left:4px;line-height:1.5;}
 .ibox li::marker{color:var(--accent);}
 .brow{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;}
-.alertbox{border-radius:12px;padding:13px 17px;margin-bottom:20px;font-size:13px;}
+.alertbox{border-radius:12px;padding:13px 17px;margin-bottom:14px;font-size:13px;}
 .alertwarn{background:#fbbf2412;border:1px solid #fbbf2440;color:var(--warn);}
 .alertinfo{background:#6366f112;border:1px solid #6366f140;color:var(--accentL);}
 .alertholiday{background:#c084fc12;border:1px solid #c084fc40;color:var(--holiday);}
@@ -255,6 +300,29 @@ select option{background:var(--bg3);}
 .uzone .uicon{font-size:44px;margin-bottom:12px;}
 .uzone p{font-size:13px;color:var(--muted);}
 
+/* ─── FOOTER ─── */
+footer{
+  background:var(--card);border-top:1px solid var(--border);
+  padding:28px 32px;margin-top:auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;
+}
+.foot-brand{display:flex;align-items:center;gap:10px;}
+.foot-brand .ficon{width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  display:flex;align-items:center;justify-content:center;font-size:15px;}
+.foot-brand h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}
+.foot-brand h4 span{color:var(--accent);}
+.foot-brand p{font-size:11px;color:var(--muted);}
+.foot-contact{text-align:right;}
+.foot-contact p{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.foot-email{display:inline-flex;align-items:center;gap:7px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:99px;padding:7px 16px;font-size:13px;font-weight:500;
+  color:var(--accentL);text-decoration:none;transition:all .2s;}
+.foot-email:hover{border-color:var(--accent);background:#6366f115;color:var(--accent);}
+.foot-copy{font-size:11px;color:var(--muted);margin-top:5px;}
+
 /* ─── MISC ─── */
 .estate{text-align:center;padding:70px 20px;}
 .estate .ei{font-size:64px;margin-bottom:16px;opacity:.6;}
@@ -269,11 +337,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 </head>
 <body>
 
-<!-- ══════════════════════ LOGIN ══════════════════════ -->
+<!-- ════════════════════ LOGIN ════════════════════ -->
 <div id="loginScreen">
   <div class="lb"><div class="grid-bg"></div><div class="dots-bg"></div></div>
   <div class="lcard">
-    <div class="lbadge">🎓 College Department Portal</div>
+    <div class="lbadge">🎓 SSREC Attendance Portal</div>
     <div class="llogo">
       <div class="licon">📋</div>
       <h1>Attend<span>X</span></h1>
@@ -289,24 +357,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
              onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
     </div>
     <p class="lerr" id="lerr">⚠️ Invalid credentials. Access denied.</p>
-    <button class="btn btn-p" onclick="doLogin()">🔐 &nbsp;Sign In to Portal</button>
+    <button class="btn btn-p" onclick="doLogin()">Sign In to Portal</button>
     <p style="text-align:center;margin-top:18px;font-size:11px;color:var(--muted);">
-      Credentials: &nbsp;
-      <code style="background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--text);">admin</code>
-      &nbsp;/&nbsp;
-      <code style="background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--text);">admin123</code>
+      Created by Mahendz &nbsp;
+      <code style="background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--text);"></code>
+      <code style="background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--text);"></code>
     </p>
   </div>
 </div>
 
-<!-- ══════════════════════ APP ══════════════════════ -->
-<div id="app" style="display:none;flex-direction:column;">
+<!-- ════════════════════ APP ════════════════════ -->
+<div id="app" style="display:none;flex-direction:column;min-height:100vh;">
+
   <header>
     <div class="hleft">
       <div class="hicon">📋</div>
       <div>
         <div class="htitle">Attend<span>X</span></div>
-        <div class="hsubt">College Department Attendance Portal</div>
+        <div class="hsubt">SSREC Students Attendance Portal</div>
       </div>
     </div>
     <div class="hright">
@@ -321,55 +389,67 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     <div class="tab" id="tab-vault" onclick="switchTab('vault')">📁 Data Vault <span class="tcnt" id="tc-vault">0</span></div>
   </div>
 
-  <!-- ─── ATTENDANCE ─── -->
+  <!-- ─── ATTENDANCE PAGE ─── -->
   <div class="page active" id="page-att">
+
+    <!-- PRINT HEADER (only shows on print) -->
+    <div class="print-header" id="printHead"></div>
+
     <div id="att-empty" class="estate">
       <div class="ei">🏫</div>
       <h3>No Register Found</h3>
       <p>Go to <b>Setup</b> to add students and configure your session date range.</p>
       <button class="btn btn-p" onclick="switchTab('setup')" style="width:auto;padding:14px 28px;">Go to Setup →</button>
     </div>
+
     <div id="att-con" style="display:none;">
       <div class="sstrip" id="sstrip"></div>
+
       <div class="ph">
         <div>
           <div class="ptitle">📋 Attendance Register</div>
           <div class="psub" id="regRange"></div>
         </div>
-        <button class="btn btn-g" onclick="openUpdateModal()">✅ &nbsp;Update Attendance</button>
+        <div class="phbtns">
+          <button class="btn btn-pdf btn-sm" onclick="exportPDF()">📄 &nbsp;Export PDF</button>
+          <button class="btn btn-g" onclick="openUpdateModal()">✅ &nbsp;Update Attendance</button>
+        </div>
       </div>
+
       <div class="twrap">
-        <table><thead id="tH"></thead><tbody id="tB"></tbody></table>
+        <table id="mainTable"><thead id="tH"></thead><tbody id="tB"></tbody></table>
       </div>
+
       <div class="tipnote">
-        💡 Click any <b>date column header</b> to toggle it as a holiday &nbsp;|&nbsp;
+        💡 Click any <b>date column header</b> to toggle holiday &nbsp;|&nbsp;
         <span style="color:var(--present)">● Present (1)</span>&nbsp;
         <span style="color:var(--absent)">● Absent (0)</span>&nbsp;
         <span style="color:var(--holiday)">● Holiday</span>&nbsp;
-        <span style="color:var(--muted)">● Pending (—)</span>
+        <span style="color:var(--muted)">● Pending (—)</span>&nbsp;|&nbsp;
+        <span style="color:var(--accentL)">■ Attendance % column auto-calculates</span>
       </div>
     </div>
   </div>
 
-  <!-- ─── SETUP ─── -->
+  <!-- ─── SETUP PAGE ─── -->
   <div class="page" id="page-setup">
     <div class="wwrap">
       <div class="wcard">
-        <div class="segrow" id="segrow">
+        <div class="segrow">
           <div class="seg active" id="s0"></div>
           <div class="seg" id="s1"></div>
           <div class="seg" id="s2"></div>
           <div class="seg" id="s3"></div>
         </div>
 
-        <!-- Step 0: Welcome -->
         <div class="ws active" id="ws0">
           <div class="wtitle">👋 Welcome, Professor</div>
-          <p class="wsub">Set up your department attendance register in 4 quick steps. All data is stored securely in your browser.</p>
+          <p class="wsub">Set up your department attendance register in 4 quick steps.</p>
           <ul class="ibox" style="list-style:disc;padding-left:20px;">
             <li>Add all enrolled students with auto-assigned roll numbers</li>
             <li>Set semester / session date range</li>
-            <li>Mark attendance daily — percentage auto-calculates</li>
+            <li>Mark attendance daily — percentage auto-calculates instantly</li>
+            <li>Export the full register as a PDF to share with your class group</li>
             <li>Store student photos, fee receipts & documents in the Vault</li>
           </ul>
           <div id="exist-alert" class="alertbox alertdanger" style="display:none;">
@@ -378,7 +458,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
           <button class="btn btn-p" onclick="wGo(1)">Begin Setup →</button>
         </div>
 
-        <!-- Step 1: Count -->
         <div class="ws" id="ws1">
           <div class="wtitle">👥 Class Strength</div>
           <p class="wsub">How many students are enrolled in this section?</p>
@@ -392,7 +471,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
           </div>
         </div>
 
-        <!-- Step 2: Names -->
         <div class="ws" id="ws2">
           <div class="wtitle">📝 Student Names</div>
           <p class="wsub">Enter names in attendance roll order. Roll numbers are assigned automatically.</p>
@@ -403,17 +481,16 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
           </div>
         </div>
 
-        <!-- Step 3: Dates -->
         <div class="ws" id="ws3">
           <div class="wtitle">📅 Session Date Range</div>
-          <p class="wsub">Set the semester or course period. You can mark individual days as holidays later.</p>
+          <p class="wsub">Set the semester or course period. Mark individual days as holidays later.</p>
           <div class="row2">
             <div class="ig"><label>From Date</label><input type="date" id="dFrom"></div>
             <div class="ig"><label>To Date</label><input type="date" id="dTo"></div>
           </div>
           <div class="ig">
             <label>Department / Subject (optional)</label>
-            <input type="text" id="dDept" placeholder="e.g. Computer Science — Data Structures (Sem 4)">
+            <input type="text" id="dDept" placeholder="e.g. CSE — Data Structures (Sem 4)">
           </div>
           <div class="brow">
             <button class="btn btn-s" onclick="wGo(2)">← Back</button>
@@ -428,7 +505,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     </div>
   </div>
 
-  <!-- ─── VAULT ─── -->
+  <!-- ─── VAULT PAGE ─── -->
   <div class="page" id="page-vault">
     <div class="ph">
       <div>
@@ -439,29 +516,44 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
     </div>
     <div class="vgrid" id="vgrid"></div>
   </div>
-</div>
+
+  <!-- ════ FOOTER ════ -->
+  <footer>
+    <div class="foot-brand">
+      <div class="ficon">📋</div>
+      <div>
+        <h4>Attend<span>X</span></h4>
+        <p>College Department Attendance Portal</p>
+      </div>
+    </div>
+    <div class="foot-contact">
+      <p>📬 Contact / Support</p>
+      <a class="foot-email" href="mailto:mahendiran00k@gmail.com">
+        ✉️ &nbsp;mahendiran00k@gmail.com
+      </a>
+      <div class="foot-copy">© 2025 AttendX &nbsp;·&nbsp; Built for College Departments</div>
+    </div>
+  </footer>
+
+</div><!-- /app -->
 
 <!-- ══════════ UPDATE MODAL ══════════ -->
 <div class="overlay" id="updOv">
   <div class="modal">
     <div class="mtitle">✅ Mark Attendance</div>
     <div class="msub">Select students who are <b style="color:var(--danger)">ABSENT</b>. All others are auto-marked <b style="color:var(--present)">PRESENT</b>.</div>
-
     <div class="ig" style="max-width:220px;margin-bottom:8px;">
       <label>Date</label>
       <input type="date" id="updDate" onchange="onDateCh()">
     </div>
     <div id="wd-out" class="alertbox alertwarn" style="display:none;">⚠️ Date is outside your session range.</div>
     <div id="wd-hol" class="alertbox alertholiday" style="display:none;">🎉 This day is marked as a Holiday.</div>
-    <div id="wd-dup" class="alertbox alertinfo" style="display:none;">ℹ️ Attendance already saved for this date — saving will overwrite it.</div>
-
+    <div id="wd-dup" class="alertbox alertinfo" style="display:none;">ℹ️ Attendance already saved — saving will overwrite it.</div>
     <div class="cklist" id="cklist"></div>
-
-    <div class="sumbar" id="sumbar">
+    <div class="sumbar">
       <div class="sitem"><div class="sdot" style="background:var(--present)"></div><span id="pCnt">0 Present</span></div>
       <div class="sitem"><div class="sdot" style="background:var(--danger)"></div><span id="aCnt">0 Absent</span></div>
     </div>
-
     <div class="brow">
       <button class="btn btn-s" onclick="closeUpdate()">Cancel</button>
       <button class="btn btn-g" onclick="saveAtt()">💾 &nbsp;Save Attendance</button>
@@ -515,10 +607,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 
 <script>
 /* ─── STATE ─── */
-const AUTH = { admin: 'admin123' };
-let S = (() => { try{ return JSON.parse(localStorage.getItem('attendx3'))||blank(); }catch{ return blank(); } })();
+const AUTH = { admin: 'admin1234' };
+let S = (() => { try{ return JSON.parse(localStorage.getItem('attendx4'))||blank(); }catch{ return blank(); } })();
 function blank(){ return {students:[],dateFrom:'',dateTo:'',dept:'',attendance:{},holidays:[],vault:[]}; }
-function save(){ localStorage.setItem('attendx3', JSON.stringify(S)); }
+function save(){ localStorage.setItem('attendx4', JSON.stringify(S)); }
 
 /* ─── AUTH ─── */
 function doLogin(){
@@ -571,8 +663,7 @@ function wGo(n){
   if(n===0) document.getElementById('exist-alert').style.display=S.students.length?'block':'none';
 }
 function buildNames(cnt){
-  const el=document.getElementById('snlist');
-  el.innerHTML='';
+  const el=document.getElementById('snlist'); el.innerHTML='';
   for(let i=0;i<cnt;i++){
     const d=document.createElement('div'); d.className='snrow';
     d.innerHTML=`<span class="rchip">${String(i+1).padStart(2,'0')}</span>
@@ -605,10 +696,26 @@ function resetAll(){
 }
 
 /* ─── DATE UTILS ─── */
-function getDates(f,t){ const a=[],d=new Date(f+'T00:00:00'),e=new Date(t+'T00:00:00'); while(d<=e){a.push(d.toISOString().split('T')[0]);d.setDate(d.getDate()+1);} return a; }
+function getDates(f,t){
+  const a=[],d=new Date(f+'T00:00:00'),e=new Date(t+'T00:00:00');
+  while(d<=e){a.push(d.toISOString().split('T')[0]);d.setDate(d.getDate()+1);}
+  return a;
+}
 function fmt(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
 function fmtW(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short'}); }
+function fmtFull(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}); }
 function today(){ return new Date().toISOString().split('T')[0]; }
+
+/* ─── CALC % ─── */
+function calcPct(student, dates){
+  let prs=0, tot=0;
+  dates.forEach(d=>{
+    if(S.holidays.includes(d)) return;
+    tot++;
+    if(S.attendance[d] && S.attendance[d][student.roll]!==0) prs++;
+  });
+  return { prs, tot, pct: tot>0 ? Math.round(prs/tot*100) : 0 };
+}
 
 /* ─── RENDER ─── */
 function renderAll(){
@@ -627,48 +734,63 @@ function renderAtt(){
   const classDays=dates.filter(d=>!S.holidays.includes(d)).length;
   const doneDays=dates.filter(d=>!S.holidays.includes(d)&&S.attendance[d]).length;
 
+  // Update print header
+  document.getElementById('printHead').innerHTML=`
+    <div style="text-align:center;margin-bottom:18px;border-bottom:2px solid #1e1b4b;padding-bottom:14px;">
+      <div style="font-size:22px;font-weight:800;font-family:Arial,sans-serif;color:#1e1b4b;">📋 AttendX — Attendance Register</div>
+      <div style="font-size:13px;color:#374151;margin-top:6px;">${S.dept||'Department Attendance'}</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px;">${fmtFull(S.dateFrom)} to ${fmtFull(S.dateTo)} &nbsp;·&nbsp; Total Students: ${S.students.length} &nbsp;·&nbsp; Class Days: ${classDays}</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:3px;">Exported on ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    </div>`;
+
   document.getElementById('regRange').textContent=
     (S.dept?S.dept+' · ':'')+fmt(S.dateFrom)+' — '+fmt(S.dateTo);
+
+  // Average class attendance
+  let totalPct=0;
+  S.students.forEach(s=>{ totalPct+=calcPct(s,dates).pct; });
+  const avgPct = S.students.length ? Math.round(totalPct/S.students.length) : 0;
+  const below75 = S.students.filter(s=>calcPct(s,dates).pct<75).length;
 
   document.getElementById('sstrip').innerHTML=`
     <div class="scard si"><div class="slabel">Total Students</div><div class="sval">${S.students.length}</div><div class="ssub">Enrolled</div></div>
     <div class="scard sg"><div class="slabel">Class Days</div><div class="sval">${classDays}</div><div class="ssub">${S.holidays.length} holiday${S.holidays.length!==1?'s':''}</div></div>
-    <div class="scard so"><div class="slabel">Recorded</div><div class="sval">${doneDays}</div><div class="ssub">Days marked</div></div>
-    <div class="scard sp"><div class="slabel">Pending</div><div class="sval">${classDays-doneDays}</div><div class="ssub">Days remaining</div></div>`;
+    <div class="scard so"><div class="slabel">Avg Attendance</div><div class="sval">${avgPct}%</div><div class="ssub">Class average</div></div>
+    <div class="scard sp"><div class="slabel">Below 75%</div><div class="sval">${below75}</div><div class="ssub">At-risk students</div></div>`;
 
-  // Head
+  // ── HEAD ──
   let head='<tr><th class="sc">Student</th><th>Roll</th>';
   dates.forEach(d=>{
     const isH=S.holidays.includes(d);
-    head+=`<th class="dh${isH?' hth':''}" onclick="togHol('${d}')" title="${isH?'Click to unmark holiday':'Click to mark as holiday'}">
+    head+=`<th class="dh${isH?' hth':''}" onclick="togHol('${d}')" title="${isH?'Unmark holiday':'Mark as holiday'}">
       ${fmt(d)}<br><span style="font-weight:400;font-size:9px;opacity:.7;">${fmtW(d)}</span>
-      ${isH?'<span class="hbadge">HOLIDAY</span>':''}
+      ${isH?'<span class="hbadge">HOL</span>':''}
     </th>`;
   });
-  head+='<th>Attendance %</th></tr>';
+  head+='<th class="pct-th">📊 Attendance %<br><span style="font-weight:400;font-size:9px;opacity:.8;">Auto-calculated</span></th></tr>';
   document.getElementById('tH').innerHTML=head;
 
-  // Body
+  // ── BODY ──
   let body='';
   S.students.forEach(s=>{
-    let prs=0,tot=0,cells='';
+    let cells='';
     dates.forEach(d=>{
       if(S.holidays.includes(d)){ cells+=`<td class="ch">🎉</td>`; return; }
-      tot++;
       if(S.attendance[d]){
-        if(S.attendance[d][s.roll]===0){ cells+=`<td class="ca">0</td>`; }
-        else{ prs++; cells+=`<td class="cp">1</td>`; }
+        if(S.attendance[d][s.roll]===0) cells+=`<td class="ca">0</td>`;
+        else cells+=`<td class="cp">1</td>`;
       } else cells+=`<td class="cn">—</td>`;
     });
-    const pct=tot>0?Math.round(prs/tot*100):0;
+    const {prs,tot,pct}=calcPct(s,dates);
     const pc=pct>=75?'pg':pct>=50?'po':'pb';
     const fc=pct>=75?'var(--present)':pct>=50?'var(--warn)':'var(--danger)';
     body+=`<tr>
       <td class="sc">${s.name}</td>
       <td><span class="rno">${String(s.roll).padStart(2,'0')}</span></td>
       ${cells}
-      <td>
+      <td class="pct-td">
         <span class="ppill ${pc}">${pct}%</span>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;">${prs}/${tot} days</div>
         <div class="pwrap"><div class="pfill" style="width:${pct}%;background:${fc};"></div></div>
       </td>
     </tr>`;
@@ -681,6 +803,13 @@ function togHol(d){
   if(i>=0) S.holidays.splice(i,1); else S.holidays.push(d);
   save(); renderAtt();
   toast(S.holidays.includes(d)?'🎉 Marked as Holiday':'📅 Holiday removed');
+}
+
+/* ─── PDF EXPORT ─── */
+function exportPDF(){
+  if(!S.students.length){ toast('⚠️ No data to export'); return; }
+  toast('📄 Opening print dialog… Use "Save as PDF"');
+  setTimeout(()=>window.print(), 400);
 }
 
 /* ─── UPDATE MODAL ─── */
@@ -770,7 +899,7 @@ function renderVault(){
   document.getElementById('tc-vault').textContent=S.vault.length;
   if(!S.vault.length){
     g.innerHTML=`<div class="estate" style="grid-column:1/-1;"><div class="ei">📂</div>
-      <h3>Vault is Empty</h3><p>Store student photos, fee receipts, and documents here for easy access.</p></div>`;
+      <h3>Vault is Empty</h3><p>Store student photos, fee receipts, and documents here.</p></div>`;
     return;
   }
   g.innerHTML=S.vault.map(v=>`
@@ -788,8 +917,7 @@ function renderVault(){
 }
 function delV(id){
   if(!confirm('Delete this file from the vault?')) return;
-  S.vault=S.vault.filter(v=>v.id!==id);
-  save(); renderVault();
+  S.vault=S.vault.filter(v=>v.id!==id); save(); renderVault();
 }
 
 /* ─── TOAST ─── */
